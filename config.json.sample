@@ -1,0 +1,15 @@
+{
+  "host": "https://hostname",
+  "username": "username",
+  "password": "password",
+  "queries": [
+    {
+      "name": "test project total",
+      "jql": "project = TEST"
+    },
+    {
+      "name": "test project to do",
+      "jql": "project = TEST and status = \"To Do\""
+    }
+  ]
+}
