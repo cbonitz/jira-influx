@@ -2,14 +2,38 @@
   "host": "https://hostname",
   "username": "username",
   "password": "password",
+  "influxHost": "http://hostname:8086",
+  "influxDB": "jira",
+  "influxUsername": "username",
+  "influxPassword": "password",
   "queries": [
     {
-      "name": "test project total",
+      "tags": {
+        "entity":"test",
+        "status":"all"
+      },
       "jql": "project = TEST"
     },
     {
-      "name": "test project to do",
+      "tags": {
+        "entity":"test",
+        "status":"todo"
+      },
       "jql": "project = TEST and status = \"To Do\""
+    },
+    {
+      "tags": {
+        "entity":"test",
+        "status":"in_progress"
+      },
+      "jql": "project = TEST and status = \"In Progress\""
+    },
+    {
+      "tags": {
+        "entity":"test",
+        "status":"done"
+      },
+      "jql": "project = TEST and status = \"Done\""
     }
   ]
 }
