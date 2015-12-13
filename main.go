@@ -17,7 +17,7 @@ func checkError(err error) {
 }
 
 func runJqlQuery(config map[string]interface{}, jql string) int {
-	host := config["jiraHost"].(string)
+	host := config["jiraUrl"].(string)
 	username := config["jiraUsername"].(string)
 	password := config["jiraPassword"].(string)
 
@@ -40,7 +40,7 @@ func runJqlQuery(config map[string]interface{}, jql string) int {
 }
 
 func createInfluxClient(config map[string]interface{}) client.Client {
-	host := config["influxHost"].(string)
+	host := config["influxUrl"].(string)
 	username := ""
 	password := ""
 	if config["influxPassword"] != nil {
