@@ -6,6 +6,8 @@ Configure your `GOPATH` and run `go get github.com/cbonitz/jira-influx`
 
 ## Usage
 Create a configuration file, then just run `jira-influx` in the same directory.
+This will create one measurement for each query.
+Use your favorite job scheduler to do this at the interval of your choice.
 
 ## Configuration
 Create a `config.json` file with the same structure as `config.json.sample`.
