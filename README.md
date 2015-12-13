@@ -5,7 +5,7 @@ This tool counts issues for different JQL Queries and writes the results to Infl
 Configure your `GOPATH` and run `go get github.com/cbonitz/jira-influx`
 
 ## Usage
-Create a configuration file, then just run `jira-influx`
+Create a configuration file, then just run `jira-influx` in the same directory.
 
 ## Configuration
 Create a `config.json` file with the same structure as `config.json.sample`.
