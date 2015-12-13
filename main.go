@@ -21,14 +21,19 @@ func runJqlQuery(config map[string]interface{}, jql string) int {
 	username := config["jiraUsername"].(string)
 	password := config["jiraPassword"].(string)
 
+	// Create the authenticated  HTTP request
 	client := &http.Client{}
 	params := url.Values{}
 	params.Add("jql", jql)
+	// we actually only care about the total atm.
+	// specifying one field reduces the amount of useless data in the response
 	params.Add("fields", "key")
 	req, err := http.NewRequest("GET", host+"/rest/api/latest/search?"+params.Encode(), nil)
 	req.SetBasicAuth(username, password)
 	resp, err := client.Do(req)
 	checkError(err)
+
+	// Read and parse JSON body
 	defer resp.Body.Close()
 	rawBody, err := ioutil.ReadAll(resp.Body)
 	checkError(err)
@@ -36,6 +41,8 @@ func runJqlQuery(config map[string]interface{}, jql string) int {
 	err = json.Unmarshal(rawBody, &jsonResult)
 	checkError(err)
 	m := jsonResult.(map[string]interface{})
+
+	// extract the interesting data
 	return int(m["total"].(float64))
 }
 
@@ -65,15 +72,20 @@ func createBatchPoints(config map[string]interface{}, c client.Client) client.Ba
 	return bp
 }
 
+// addPoint adds a point with tags to a BatchPoints object for sending them later
 func addPoint(batchPoints client.BatchPoints, rawTags map[string]interface{}, count int) {
+	// put tags from config into the right type of map
 	tags := map[string]string{}
 	for key, value := range rawTags {
 		tags[key] = value.(string)
 	}
+	// right now, there's only one field, count
 	fields := map[string]interface{}{"count": count}
+	// right now, the measurement name is fixed
+	// adding a time here - this may make sense if JIRA queries are long running
 	pt, err := client.NewPoint("issue_count", tags, fields, time.Now())
 	checkError(err)
-	fmt.Printf("%v: %d issues\n", tags, count)
+	fmt.Printf("Prepared for sending: %v: %d issues\n", tags, count)
 	batchPoints.AddPoint(pt)
 }
 
