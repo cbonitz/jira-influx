@@ -98,10 +98,13 @@ func main() {
 	checkError(configErr)
 	config := jsonConfig.(map[string]interface{})
 	queries := config["queries"].([]interface{})
-
 	// create influx client and batch points (only one send operation at the end)
 	influxClient := createInfluxClient(config)
 	batchPoints := createBatchPoints(config, influxClient)
+	durationBetweenJiraQueries := time.Duration(100) * time.Millisecond
+	if val, defined := config["jiraPauseMilliseconds"]; defined {
+		durationBetweenJiraQueries = time.Duration(int(val.(float64))) * time.Millisecond
+	}
 	for _, queryObject := range queries {
 		q := queryObject.(map[string]interface{})
 		// run jira query
@@ -109,6 +112,7 @@ func main() {
 		count := runJqlQuery(config, jql)
 		// create influx point and save for later
 		addPoint(batchPoints, q["tags"].(map[string]interface{}), count)
+		time.Sleep(durationBetweenJiraQueries)
 	}
 	fmt.Println("Writing data to InfluxDB")
 	// write the points

@@ -1,8 +1,9 @@
 {
-  "host": "https://hostname",
-  "username": "username",
-  "password": "password",
-  "influxHost": "http://hostname:8086",
+  "jiraUrl": "https://hostname",
+  "jiraUsername": "username",
+  "jiraPassword": "password",
+  "jiraPauseMilliseconds": 500,
+  "influxUrl": "http://hostname:8086",
   "influxDB": "jira",
   "influxUsername": "username",
   "influxPassword": "password",
