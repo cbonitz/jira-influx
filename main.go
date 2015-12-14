@@ -116,6 +116,6 @@ func main() {
 	}
 	fmt.Println("Writing data to InfluxDB")
 	// write the points
-	influxClient.Write(batchPoints)
-
+	influxErr := influxClient.Write(batchPoints)
+	checkError(influxErr)
 }
