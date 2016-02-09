@@ -73,19 +73,19 @@ func createBatchPoints(config map[string]interface{}, c client.Client) client.Ba
 }
 
 // addPoint adds a point with tags to a BatchPoints object for sending them later
-func addPoint(batchPoints client.BatchPoints, rawTags map[string]interface{}, count int) {
+func addPoint(batchPoints client.BatchPoints, timeOfQuery time.Time, rawTags map[string]interface{}, count int, durationMilliseconds int64) {
 	// put tags from config into the right type of map
 	tags := map[string]string{}
 	for key, value := range rawTags {
 		tags[key] = value.(string)
 	}
-	// right now, there's only one field, count
-	fields := map[string]interface{}{"count": count}
-	// right now, the measurement name is fixed
-	// adding a time here - this may make sense if JIRA queries are long running
-	pt, err := client.NewPoint("issue_count", tags, fields, time.Now())
+	fields := map[string]interface{}{
+		"count":                count,
+		"durationMilliseconds": durationMilliseconds}
+	// for now, the measurement name is fixed
+	pt, err := client.NewPoint("issue_count", tags, fields, timeOfQuery)
 	checkError(err)
-	fmt.Printf("Prepared for sending: %v: %d issues\n", tags, count)
+	fmt.Printf("Prepared for sending: %v: %d issues (in %d ms)\n", tags, count, durationMilliseconds)
 	batchPoints.AddPoint(pt)
 }
 
@@ -109,9 +109,14 @@ func main() {
 		q := queryObject.(map[string]interface{})
 		// run jira query
 		jql := q["jql"].(string)
+
+		timeBeforeQuery := time.Now()
 		count := runJqlQuery(config, jql)
+		timeAfterQuery := time.Now()
+
+		queryDurationMilliseconds := timeAfterQuery.Sub(timeBeforeQuery).Nanoseconds() / 1000000
 		// create influx point and save for later
-		addPoint(batchPoints, q["tags"].(map[string]interface{}), count)
+		addPoint(batchPoints, timeBeforeQuery, q["tags"].(map[string]interface{}), count, queryDurationMilliseconds)
 		time.Sleep(durationBetweenJiraQueries)
 	}
 	fmt.Println("Writing data to InfluxDB")
